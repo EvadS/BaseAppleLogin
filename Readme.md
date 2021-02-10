@@ -14,7 +14,7 @@ Demo project for describe how create first step on apple login
 
 3. ### build with maven  
 ```bash
-mvn clen install
+mvn clean install
 ```  
 run 
 ```bash
