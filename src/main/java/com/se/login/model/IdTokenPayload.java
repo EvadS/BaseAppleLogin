@@ -1,4 +1,4 @@
-package com.se.login;
+package com.se.login.model;
 
 public class IdTokenPayload {
     private String iss;

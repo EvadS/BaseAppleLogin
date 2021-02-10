@@ -1,4 +1,4 @@
-package com.se.login;
+package com.se.login.model;
 
 public class TokenResponse {
     private String access_token;

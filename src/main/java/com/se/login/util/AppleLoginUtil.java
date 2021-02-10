@@ -1,29 +1,32 @@
-package com.se.login;
+package com.se.login.util;
 
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.se.login.exception.CertificateNotFoundException;
+import com.se.login.exception.EmptyParametersException;
+import com.se.login.model.IdTokenPayload;
+import com.se.login.model.TokenResponse;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
 import java.io.FileReader;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
+import java.net.URL;
 import java.security.PrivateKey;
 import java.util.Date;
 
 public class AppleLoginUtil {
     // APPLE CREDENTIAL BLOCK -->
     public static final String CERTIFICATE_PATH = "";
-    private static final String APPLE_AUTH_URL = "";
+    private static final String APPLE_AUTH_URL = "https://appleid.apple.com/auth/token";
     private static final String KEY_ID = "";
-    private static final String TEAM_ID = "";
+    private static final String TEAM_ID = "CZPF459SQ";
     private static final String CLIENT_ID = "";
     private static final String WEB_CLIENT_ID = "";
     private static final String WEB_REDIRECT_URL = "";
@@ -33,6 +36,12 @@ public class AppleLoginUtil {
     private static PrivateKey getPrivateKey() throws Exception {
 
         ClassLoader classLoader = AppleLoginUtil.class.getClassLoader();
+
+        URL url = classLoader.getResource(CERTIFICATE_PATH);
+        if (url == null) {
+            throw new CertificateNotFoundException(CERTIFICATE_PATH);
+        }
+
         String path = classLoader.getResource(CERTIFICATE_PATH).getPath();
 
         final PEMParser pemParser = new PEMParser(new FileReader(path));
@@ -81,6 +90,8 @@ public class AppleLoginUtil {
      * */
     public static String appleAuth(String authorizationCode, boolean forWeb) throws Exception {
 
+        validateCurrentParams();
+
         HttpResponse<String> response = Unirest.post(APPLE_AUTH_URL)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .field("client_id", forWeb ? WEB_CLIENT_ID : CLIENT_ID)
@@ -107,6 +118,35 @@ public class AppleLoginUtil {
         IdTokenPayload idTokenPayload = new Gson().fromJson(decoded, IdTokenPayload.class);
 
         return idTokenPayload.getSub();
+    }
+
+
+    private static void validateCurrentParams() {
+
+        if (StringUtils.isEmpty(CERTIFICATE_PATH) || StringUtils.isBlank(CERTIFICATE_PATH)) {
+            throw new EmptyParametersException("CERTIFICATE_PATH");
+        }
+
+        if (StringUtils.isEmpty(APPLE_AUTH_URL) || StringUtils.isBlank(APPLE_AUTH_URL)) {
+            throw new EmptyParametersException("APPLE_AUTH_URL");
+        }
+
+        if (StringUtils.isEmpty(KEY_ID) || StringUtils.isBlank(KEY_ID)) {
+            throw new EmptyParametersException("KEY_ID");
+        }
+
+        if (StringUtils.isEmpty(TEAM_ID) || StringUtils.isBlank(TEAM_ID)) {
+            throw new EmptyParametersException("TEAM_ID");
+        }
+
+
+        if (StringUtils.isEmpty(WEB_CLIENT_ID) || StringUtils.isBlank(WEB_CLIENT_ID)) {
+            throw new EmptyParametersException("WEB_CLIENT_ID");
+        }
+
+        if (StringUtils.isEmpty(WEB_REDIRECT_URL) || StringUtils.isBlank(WEB_REDIRECT_URL)) {
+            throw new EmptyParametersException("WEB_REDIRECT_URL");
+        }
     }
 
 
