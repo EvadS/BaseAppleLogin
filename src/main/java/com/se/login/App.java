@@ -1,7 +1,9 @@
 package com.se.login;
 
+import com.google.gson.JsonSyntaxException;
 import com.se.login.exception.CertificateNotFoundException;
 import com.se.login.exception.EmptyParametersException;
+import com.se.login.exception.TokenResponseIncorrectFormat;
 import com.se.login.util.AppleLoginUtil;
 
 public class App {
@@ -15,7 +17,14 @@ public class App {
         }catch (EmptyParametersException epe){
             System.out.println("Please check your apple credentials.");
             System.out.println(epe.getMessage());
-        } catch (Exception e) {
+        } catch (JsonSyntaxException jsonSyntaxException) {
+            System.out.println("Incorrect response format. ");
+            System.out.println(jsonSyntaxException.getMessage());
+        }catch (TokenResponseIncorrectFormat rfe){
+            System.out.println("Incorrect  token response format. ");
+            System.out.println(rfe.getMessage());
+        }
+        catch (Exception e) {
             System.out.println("was error ");
             e.printStackTrace();
         }

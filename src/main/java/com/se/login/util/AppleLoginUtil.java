@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.se.login.exception.CertificateNotFoundException;
 import com.se.login.exception.EmptyParametersException;
+import com.se.login.exception.TokenResponseIncorrectFormat;
 import com.se.login.model.IdTokenPayload;
 import com.se.login.model.TokenResponse;
 import io.jsonwebtoken.JwsHeader;
@@ -67,7 +68,7 @@ public class AppleLoginUtil {
                 .signWith(pKey, SignatureAlgorithm.ES256)
                 .compact();
 
-        System.out.println("generated token\n" + token + "\n");
+        System.out.println("generated token\n" + token  + "\n----------------------------\n");
         return token;
     }
 
@@ -82,7 +83,7 @@ public class AppleLoginUtil {
                 .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
 
-        System.out.println("generated token for web \n" + token + "\n");
+        System.out.println("generated token for web \n" + token + "\n----------------------------\n");
         return token;
     }
 
@@ -114,6 +115,10 @@ public class AppleLoginUtil {
         }
 
         TokenResponse tokenResponse = gson.fromJson(response.getBody(), TokenResponse.class);
+        if(tokenResponse.getToken_type() == null){
+           throw new TokenResponseIncorrectFormat(response.getBody());
+        }
+
         String idToken = tokenResponse.getId_token();
         String payload = idToken.split("\\.")[1];//0 is header we ignore it for now
         String decoded = new String(Decoders.BASE64.decode(payload));
