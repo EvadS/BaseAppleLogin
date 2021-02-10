@@ -95,3 +95,5 @@ local.properties
 
 
 hs_err_pid*
+/src/main/resources/apple/
+src/test/

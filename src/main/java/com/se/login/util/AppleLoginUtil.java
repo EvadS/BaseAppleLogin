@@ -26,7 +26,7 @@ public class AppleLoginUtil {
     public static final String CERTIFICATE_PATH = "";
     private static final String APPLE_AUTH_URL = "https://appleid.apple.com/auth/token";
     private static final String KEY_ID = "";
-    private static final String TEAM_ID = "CZPF459SQ";
+    private static final String TEAM_ID = "";
     private static final String CLIENT_ID = "";
     private static final String WEB_CLIENT_ID = "";
     private static final String WEB_REDIRECT_URL = "";
@@ -67,6 +67,7 @@ public class AppleLoginUtil {
                 .signWith(pKey, SignatureAlgorithm.ES256)
                 .compact();
 
+        System.out.println("generated token\n" + token + "\n");
         return token;
     }
 
@@ -81,6 +82,7 @@ public class AppleLoginUtil {
                 .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
                 .compact();
 
+        System.out.println("generated token for web \n" + token + "\n");
         return token;
     }
 
@@ -91,6 +93,7 @@ public class AppleLoginUtil {
     public static String appleAuth(String authorizationCode, boolean forWeb) throws Exception {
 
         validateCurrentParams();
+        System.out.println("validated");
 
         HttpResponse<String> response = Unirest.post(APPLE_AUTH_URL)
                 .header("Content-Type", "application/x-www-form-urlencoded")
